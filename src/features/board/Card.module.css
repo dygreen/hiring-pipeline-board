@@ -1,0 +1,41 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  /* 카드 높이를 고정한다. 가변이면 가상 스크롤(커밋 14)에서 위치 계산이 어긋난다. */
+  min-height: 74px;
+}
+
+.name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  /* 이름이 길어도 카드가 늘어나지 않게 한 줄로 자른다. 전체 이름은 상세에서 본다. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.position {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appliedAt {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}

@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 3 `feat(board-layout)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 4 `feat(card-list)` 준비 완료 (미커밋)
 
 ---
 
@@ -13,7 +13,7 @@
 - [x] 1  `chore(setup)`           Vite + React + TS, 린트, 폴더 구조, README 뼈대
 - [x] 2  `feat(mock-api)`         MSW + localStorage persist + seed 1,000건 + 지연/실패
 - [x] 3  `feat(board-layout)`     5단계 컬럼 레이아웃
-- [ ] 4  `feat(card-list)`        지원자 카드
+- [x] 4  `feat(card-list)`        지원자 카드
 - [ ] 5  `feat(loading-error-empty)`  로딩 / 에러+재시도 / 빈 상태
 - [ ] 6  `feat(stage-move)`       액션 버튼 이동 + PATCH persist
 - [ ] 7  `feat(optimistic-update)`  낙관적 반영 + 실패 롤백 + 피드백
@@ -32,14 +32,16 @@
 
 ## 지금 하던 것
 
-커밋 3 `feat(board-layout)` 완료, **커밋 승인 대기 중**.
+커밋 4 `feat(card-list)` 완료, **커밋 승인 대기 중**.
 
-`Board.tsx`(단계별 그룹핑) / `Column.tsx`(헤더·개수·본문) / `Board.module.css`.
-카드는 `renderCard` prop으로 주입받는 구조라 커밋 4에서 자리표시자만 교체하면 된다.
+`Card.tsx` + `Card.module.css` + `lib/date.ts`. 현재 단계는 화면에 중복 표기하지 않고 sr-only로만 제공.
 
-검증: 1440×900에서 컬럼 5개 폭 분배, 표시 개수 = 실제 카드 수, 가로·세로 스크롤 동작.
+**codex 교차 리뷰를 이 커밋부터 시작**했다(원래 계획은 커밋 7). 커밋 7이 첫 실행이 되면
+도구 문제로 핵심 구간에서 시간을 버리게 되어 연결 확인을 앞당겼고, 실제 버그가 나왔다.
+`new Date('2026-08-01')` UTC 파싱 때문에 UTC보다 뒤선 시간대에서 날짜가 하루 밀리고
+연말·연초에는 연도까지 틀렸다(`2026-01-01` → `2025년 12월 31일`). 로컬 달력 날짜 파싱으로 수정.
 
-다음: 커밋 4 `feat(card-list)` — 지원자 카드 (이름·직무·지원일·현재 단계)
+다음: 커밋 5 `feat(loading-error-empty)` — 로딩 / 에러+재시도 / 빈 상태
 
 ---
 
@@ -50,6 +52,10 @@ _(막힌 것·미해결 버그·사람 확인이 필요한 것을 여기 적는�
 - 규칙 문서만 읽고 새 세션이 작업을 이어갈 수 있는지 미검증 — 구현이 몇 단계 진행된 뒤 실제로 확인할 것
 - `npm test`에 `--passWithNoTests`가 붙어 있다. 커밋 10에서 실제 테스트가 들어온 뒤,
   테스트 파일이 사라져도 통과해버리는 문제가 없는지 확인할 것
+- 실제 스크린리더(VoiceOver)로 들어본 적 없다. DOM 구조와 접근성 트리로만 확인 중.
+  커밋 13에서 한 번은 실제로 들어볼 것
+- `codex exec` 실행 시 `unknown variant 'max'` 에러 로그가 함께 찍힌다(CLI-서버 버전 불일치).
+  리뷰 결과 자체는 정상이라 그대로 쓰는 중
 - 단계 이동 규칙(건너뛰기 허용 여부, 최종합격/불합격에서 되돌리기 허용 여부)을 아직 정하지 않았다.
   현재 mock API는 어떤 단계로든 이동을 허용한다. 커밋 6에서 확정하고 `DECISIONS.md`에 적을 것
 

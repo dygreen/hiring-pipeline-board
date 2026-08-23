@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Board } from './features/board/Board'
+import { Card } from './features/board/Card'
 import type { Candidate } from './types/candidate'
 import styles from './App.module.css'
 
@@ -30,12 +31,7 @@ export default function App() {
       {candidates && (
         <Board
           candidates={candidates}
-          renderCard={(candidate) => (
-            // 커밋 4에서 Card 컴포넌트로 대체된다.
-            <div key={candidate.id} className={styles.cardPlaceholder}>
-              {candidate.name}
-            </div>
-          )}
+          renderCard={(candidate) => <Card key={candidate.id} candidate={candidate} />}
         />
       )}
     </div>

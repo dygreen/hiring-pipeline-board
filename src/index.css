@@ -8,8 +8,8 @@
   --danger: #d64545;
   --radius: 8px;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard',
-    system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
 }
@@ -34,6 +34,19 @@ h1 {
   outline-offset: 2px;
 }
 
-.app {
-  padding: 16px 20px;
+/*
+ * 화면에서는 감추되 스크린리더는 읽는 텍스트.
+ * display:none이나 visibility:hidden은 보조기술에서도 사라지므로 쓸 수 없다.
+ * 1px로 잘라내고 clip-path로 가린다.
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
