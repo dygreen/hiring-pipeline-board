@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 10 `test(optimistic-rollback)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 11 `feat(search-filter)` 준비 완료 (미커밋)
 
 ---
 
@@ -20,7 +20,7 @@
 - [x] 8  `fix(optimistic-update)`   연속 이동 시 롤백이 두 단계 전으로 가던 문제
 - [x] 9  `feat(race-condition)`   카드별 직렬 큐 + seq 기반 stale 응답 폐기
 - [x] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
-- [ ] 11 `feat(search-filter)`    이름 검색 + 직무 필터
+- [x] 11 `feat(search-filter)`    이름 검색 + 직무 필터
 - [ ] 12 `feat(detail-panel)`     사이드 패널 상세
 - [ ] 13 `feat(a11y-keyboard)`    키보드 내비게이션 + aria-live + 포커스 관리
 - [ ] 14 `feat(virtualization)`   컬럼 가상 스크롤 (1,000건)
@@ -32,16 +32,15 @@
 
 ## 지금 하던 것
 
-커밋 10 `test(optimistic-rollback)` 완료, **커밋 승인 대기 중**.
+커밋 11 `feat(search-filter)` 완료, **커밋 승인 대기 중**.
 
-`moveQueue.test.ts` 10개 + `useMoveStage.test.tsx` 6개 = 16개 통과.
+`filterCandidates.ts`(순수) + `FilterBar.tsx` + `useDeferredValue`.
+debounce 대신 `useDeferredValue`를 쓴 이유: 대기 시간을 숫자로 못 박지 않아도 된다.
+이름 검색에 공백 제거 + NFC 정규화(macOS NFD 입력 대응).
 
-**테스트가 실제로 버그를 잡는지 구현을 일부러 망가뜨려 확인했다.** 3가지 고장 모두 검출.
-그 과정에서 빈틈을 하나 찾아 테스트를 추가했다 — 직렬 큐가 생긴 뒤로는
-최종 상태만 보면 seq 검사 없이도 결과가 같지만, 화면은 offer→screening→offer로 튄다.
-캐시 변경을 구독해 거쳐 간 단계 전부를 확인하는 테스트로 보강했다.
+성능 실측: 구현을 되돌려 A/B 비교. 최대 입력 지연 156ms → 58ms, 필터 해제 시 156ms → 33ms.
 
-다음: 커밋 11 `feat(search-filter)` — 이름 검색 + 직무 필터
+다음: 커밋 12 `feat(detail-panel)` — 사이드 패널 상세
 
 ---
 
@@ -98,6 +97,9 @@ _(막힌 것·미해결 버그·사람 확인이 필요한 것을 여기 적는�
 | 1,000건 컬럼 DOM 노드 수 | — | — | 가상 스크롤 도입 전/후 |
 | 검색 입력 지연 | — | — | 1,000건 기준 |
 | mock 지연 실측 | — | 279~802ms | 커밋 2, GET 6회 |
+| 검색 입력 최대 지연 (1,000건) | 156ms | **58ms** | 커밋 11, useDeferredValue A/B |
+| 검색어 지울 때 (4→1,000장) | 156ms | **33ms** | 커밋 11 |
+| 롱태스크(50ms 초과) | 155ms·81ms | 58ms 1회 | 커밋 11 |
 | 전체 DOM 노드 (1,000건) | 1,044 | — | 커밋 3 기준값. 커밋 14에서 비교 |
 | 서류검토 컬럼 카드 노드 | 457 | — | 표시 개수와 동일 = 전부 렌더됨 |
 | 단계 분포 (1,000건) | — | 457/198/74/112/159 | 서류검토/면접/처우협의/최종합격/불합격 |
