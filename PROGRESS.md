@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 9 `feat(race-condition)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 10 `test(optimistic-rollback)` 준비 완료 (미커밋)
 
 ---
 
@@ -19,7 +19,7 @@
 - [x] 7  `feat(optimistic-update)`  낙관적 반영 + 실패 롤백 + 피드백
 - [x] 8  `fix(optimistic-update)`   연속 이동 시 롤백이 두 단계 전으로 가던 문제
 - [x] 9  `feat(race-condition)`   카드별 직렬 큐 + seq 기반 stale 응답 폐기
-- [ ] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
+- [x] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
 - [ ] 11 `feat(search-filter)`    이름 검색 + 직무 필터
 - [ ] 12 `feat(detail-panel)`     사이드 패널 상세
 - [ ] 13 `feat(a11y-keyboard)`    키보드 내비게이션 + aria-live + 포커스 관리
@@ -32,19 +32,16 @@
 
 ## 지금 하던 것
 
-커밋 9 `feat(race-condition)` 완료, **커밋 승인 대기 중**.
+커밋 10 `test(optimistic-rollback)` 완료, **커밋 승인 대기 중**.
 
-`moveQueue.ts`에 `createMoveCoordinator()` — React 비의존 모듈(다음 커밋에서 테스트).
-직렬 큐 + 순번 + **확정 단계 기준 롤백** 세 겹.
-확정 단계는 진행 중인 요청이 없을 때의 값만 신뢰한다. 그래야 겹친 요청이 모두 실패해도
-서버에 저장된 적 없는 단계로 가지 않는다.
+`moveQueue.test.ts` 10개 + `useMoveStage.test.tsx` 6개 = 16개 통과.
 
-검증: 둘 다 실패 → 서류검토 유지(낙관값 아님). 3연타 → PATCH가 클릭 순서대로 전송, 화면=서버.
+**테스트가 실제로 버그를 잡는지 구현을 일부러 망가뜨려 확인했다.** 3가지 고장 모두 검출.
+그 과정에서 빈틈을 하나 찾아 테스트를 추가했다 — 직렬 큐가 생긴 뒤로는
+최종 상태만 보면 seq 검사 없이도 결과가 같지만, 화면은 offer→screening→offer로 튄다.
+캐시 변경을 구독해 거쳐 간 단계 전부를 확인하는 테스트로 보강했다.
 
-**codex 교차 리뷰는 실패했다**(18분 무응답 + 5분 초과). 3회 상한 규칙에 따라 중단하고
-실행 검증으로 대체했다. 커밋 4에서는 같은 도구가 2분 만에 응답했었다.
-
-다음: 커밋 10 `test(optimistic-rollback)` — 롤백·경쟁 상태·큐 순서 테스트
+다음: 커밋 11 `feat(search-filter)` — 이름 검색 + 직무 필터
 
 ---
 
