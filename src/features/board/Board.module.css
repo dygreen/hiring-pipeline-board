@@ -82,3 +82,17 @@
   gap: 8px;
   min-height: 80px;
 }
+
+/*
+ * 가상 스크롤용 본문.
+ *
+ * `.columnBody`를 재사용할 수 없다. 그쪽은 `display: flex`인데,
+ * 가상 목록은 전체 높이를 가진 스페이서 div 하나를 두고 그 안에 행을 절대 배치한다.
+ * flex 컨테이너 안에서는 그 스페이서가 flex 항목으로 축소되어
+ * 53,012px로 지정한 높이가 1,510px이 되고, 스크롤이 714px에서 멈춘다.
+ */
+.virtualBody {
+  overflow-y: auto;
+  padding: 10px;
+  min-height: 80px;
+}

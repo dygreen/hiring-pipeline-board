@@ -94,7 +94,13 @@ export default function App() {
    * 이어주지 않으면 포커스가 body로 떨어져 카드 하나 옮길 때마다 처음부터 다시 찾아야 한다.
    */
   useEffect(() => {
-    keyboard.focusPending()
+    // 옮긴 카드가 어느 단계의 몇 번째인지는 목록을 가진 이쪽이 안다.
+    keyboard.focusPending((id) => {
+      const candidate = visible.find((item) => item.id === id)
+      if (!candidate) return null
+      const inColumn = visible.filter((item) => item.stage === candidate.stage)
+      return { stage: candidate.stage, index: inColumn.indexOf(candidate) }
+    })
   }, [visible, keyboard])
 
   return (

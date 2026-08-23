@@ -1,6 +1,7 @@
 import { STAGES, type Candidate } from '../../types/candidate'
 import { StateView } from '../../components/StateView'
 import { Column } from './Column'
+import { VirtualCardList } from './VirtualCardList'
 import styles from './Board.module.css'
 
 interface BoardProps {
@@ -30,9 +31,11 @@ export function Board({ candidates, renderCard }: BoardProps) {
       {STAGES.map((stage) => (
         <Column key={stage} stage={stage} count={grouped[stage].length}>
           {grouped[stage].length === 0 ? (
-            <StateView compact title="지원자가 없습니다" />
+            <div className={styles.columnBody}>
+              <StateView compact title="지원자가 없습니다" />
+            </div>
           ) : (
-            grouped[stage].map(renderCard)
+            <VirtualCardList stage={stage} candidates={grouped[stage]} renderCard={renderCard} />
           )}
         </Column>
       ))}

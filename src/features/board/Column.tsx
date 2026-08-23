@@ -33,7 +33,8 @@ export function Column({ stage, count, children, loading = false }: ColumnProps)
           </span>
         )}
       </header>
-      <div className={styles.columnBody}>{children}</div>
+      {/* 본문은 호출부가 넘긴다. 가상 스크롤은 자체 스크롤 컨테이너를 갖기 때문이다. */}
+      {children}
     </section>
   )
 }

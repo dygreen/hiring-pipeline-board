@@ -18,9 +18,11 @@ export function BoardSkeleton() {
       <span className="sr-only">지원자 목록을 불러오는 중입니다.</span>
       {STAGES.map((stage) => (
         <Column key={stage} stage={stage} count={0} loading>
-          {Array.from({ length: SKELETON_CARDS_PER_COLUMN }, (_, index) => (
-            <div key={index} className={styles.skeletonCard} aria-hidden="true" />
-          ))}
+          <div className={boardStyles.columnBody}>
+            {Array.from({ length: SKELETON_CARDS_PER_COLUMN }, (_, index) => (
+              <div key={index} className={styles.skeletonCard} aria-hidden="true" />
+            ))}
+          </div>
         </Column>
       ))}
     </div>

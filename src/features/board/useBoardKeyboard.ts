@@ -40,22 +40,55 @@ interface BoardKeyboardOptions {
   onBlocked: (message: string) => void
 }
 
-/** 같은 컬럼 안에서 다음/이전 카드로 포커스를 옮긴다. */
+/**
+ * 같은 컬럼 안에서 카드 포커스를 옮긴다.
+ *
+ * 가상 스크롤 때문에 **화면 밖 카드는 DOM에 없다.**
+ * 그래서 DOM에 있는 카드 목록에서 다음 항목을 고르는 방식은 쓸 수 없다.
+ * `End`를 누르면 진짜 마지막 카드가 아니라 "지금 그려져 있는 마지막 카드"로 가버린다.
+ *
+ * 대신 가상 목록이 남긴 `data-index`(진짜 순번)와 `data-count`(전체 개수)로 목표 순번을 계산하고,
+ * 그 카드가 DOM에 없으면 그 위치로 스크롤해 그려지게 한 뒤 포커스를 준다.
+ */
 function focusSibling(current: HTMLElement, direction: 1 | -1 | 'first' | 'last') {
-  const column = current.closest('section')
-  if (!column) return
-  const cards = [...column.querySelectorAll<HTMLElement>('article[data-id]')]
-  const index = cards.indexOf(current)
-  if (index === -1) return
+  const scroller = current.closest<HTMLElement>('[data-virtual="true"]')
+  const row = current.closest<HTMLElement>('[data-index]')
+  if (!scroller || !row) return
 
-  const target =
-    direction === 'first'
-      ? cards[0]
-      : direction === 'last'
-        ? cards[cards.length - 1]
-        : cards[index + direction]
+  const count = Number(scroller.dataset.count ?? 0)
+  const rowHeight = Number(scroller.dataset.rowHeight ?? 0)
+  const index = Number(row.dataset.index)
+  if (!count || !rowHeight || Number.isNaN(index)) return
 
-  target?.focus()
+  const target = direction === 'first' ? 0 : direction === 'last' ? count - 1 : index + direction
+
+  if (target < 0 || target >= count) return
+
+  const existing = scroller.querySelector<HTMLElement>(`[data-index="${target}"] article[data-id]`)
+  if (existing) {
+    existing.focus()
+    return
+  }
+
+  // 아직 그려지지 않은 위치다. 스크롤해서 그려지게 한 뒤 포커스를 준다.
+  scroller.scrollTop = Math.max(0, target * rowHeight - scroller.clientHeight / 2)
+  focusRowWhenRendered(scroller, target)
+}
+
+/**
+ * 스크롤 후 그 행이 그려질 때까지 기다렸다가 포커스를 준다.
+ *
+ * 한 프레임으로는 부족하다. 스크롤 이벤트가 비동기로 발생하고, 가상 목록이 그것을 받아
+ * 다시 렌더한 뒤에야 해당 행이 DOM에 생긴다. 몇 프레임 동안만 확인하고 포기한다.
+ */
+function focusRowWhenRendered(scroller: HTMLElement, index: number, attemptsLeft = 12) {
+  const element = scroller.querySelector<HTMLElement>(`[data-index="${index}"] article[data-id]`)
+  if (element) {
+    element.focus()
+    return
+  }
+  if (attemptsLeft <= 0) return
+  requestAnimationFrame(() => focusRowWhenRendered(scroller, index, attemptsLeft - 1))
 }
 
 export function useBoardKeyboard({ onMove, onSelect, onBlocked }: BoardKeyboardOptions) {
@@ -73,15 +106,38 @@ export function useBoardKeyboard({ onMove, onSelect, onBlocked }: BoardKeyboardO
    */
   const pendingFocusId = useRef<string | null>(null)
 
-  /** 목록이 다시 그려진 뒤에 호출한다. 옮긴 카드가 새 위치에 있으면 포커스를 이어준다. */
-  const focusPending = useCallback(() => {
-    const id = pendingFocusId.current
-    if (!id) return
-    const element = document.querySelector<HTMLElement>(`article[data-id="${id}"]`)
-    if (!element) return
-    pendingFocusId.current = null
-    element.focus()
-  }, [])
+  /**
+   * 목록이 다시 그려진 뒤에 호출한다. 옮긴 카드가 새 위치에 있으면 포커스를 이어준다.
+   *
+   * 가상 스크롤 때문에 **옮겨간 카드가 대상 컬럼의 화면 밖에 있으면 DOM에 없다.**
+   * 그럴 때는 그 위치로 스크롤해 그려지게 한 뒤 포커스를 준다.
+   * `locate`는 카드가 어느 단계의 몇 번째인지 알려준다(목록을 아는 쪽은 호출부다).
+   */
+  const focusPending = useCallback(
+    (locate: (id: string) => { stage: Stage; index: number } | null) => {
+      const id = pendingFocusId.current
+      if (!id) return
+      pendingFocusId.current = null
+
+      const element = document.querySelector<HTMLElement>(`article[data-id="${id}"]`)
+      if (element) {
+        element.focus()
+        return
+      }
+
+      const location = locate(id)
+      if (!location) return
+      const scroller = document.querySelector<HTMLElement>(
+        `[data-virtual="true"][data-stage="${location.stage}"]`,
+      )
+      if (!scroller) return
+
+      const rowHeight = Number(scroller.dataset.rowHeight ?? 0)
+      scroller.scrollTop = Math.max(0, location.index * rowHeight - scroller.clientHeight / 2)
+      focusRowWhenRendered(scroller, location.index)
+    },
+    [],
+  )
 
   const isRovingTarget = useCallback((candidate: Candidate, indexInColumn: number) => {
     const remembered = lastFocusedByColumn.current.get(candidate.stage)
