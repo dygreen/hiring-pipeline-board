@@ -15,6 +15,12 @@
    */
   flex: 1;
   min-height: 0;
+  /*
+   * 너비를 명시한다. flex 항목은 부모의 align-items: stretch로 폭을 받지만,
+   * 어떤 이유로든 너비가 내용 기준으로 정해지면 자식 컬럼은 flex-basis(240px)에 머물러
+   * 화면이 넓어져도 늘어나지 않고 오른쪽에 빈 공간이 남는다.
+   */
+  width: 100%;
 }
 
 .column {

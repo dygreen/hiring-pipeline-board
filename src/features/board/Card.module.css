@@ -7,7 +7,46 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   /* 카드 높이를 고정한다. 가변이면 가상 스크롤(커밋 14)에서 위치 계산이 어긋난다. */
-  min-height: 74px;
+  min-height: 108px;
+}
+
+.card[data-pending='true'] {
+  /* 이동 요청이 진행 중임을 알린다. 낙관적 업데이트(커밋 7) 전까지는 응답을 기다려야 한다. */
+  opacity: 0.55;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.action {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 0.6875rem;
+  font-family: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.action:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.action:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.reject:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .name {

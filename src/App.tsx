@@ -3,7 +3,7 @@ import { Board } from './features/board/Board'
 import { Card } from './features/board/Card'
 import { BoardSkeleton } from './components/BoardSkeleton'
 import { StateView } from './components/StateView'
-import type { Candidate } from './types/candidate'
+import type { Candidate, Stage } from './types/candidate'
 import styles from './App.module.css'
 
 /**
@@ -15,6 +15,19 @@ type LoadState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; candidates: Candidate[] }
+
+async function moveStage(id: string, stage: Stage): Promise<Candidate> {
+  const response = await fetch(`/api/candidates/${id}/stage`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ stage }),
+  })
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { message?: string } | null
+    throw new Error(body?.message ?? `이동에 실패했습니다 (${response.status})`)
+  }
+  return (await response.json()) as Candidate
+}
 
 async function fetchCandidates(signal: AbortSignal): Promise<Candidate[]> {
   const response = await fetch('/api/candidates', { signal })
@@ -56,10 +69,45 @@ export default function App() {
     setReloadKey((key) => key + 1)
   }
 
+  /** 이동 요청이 진행 중인 카드 id. 커밋 7에서 낙관적 업데이트로 대체된다. */
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [moveError, setMoveError] = useState<string | null>(null)
+
+  const handleMove = async (candidate: Candidate, to: Stage) => {
+    setPendingId(candidate.id)
+    setMoveError(null)
+    try {
+      const updated = await moveStage(candidate.id, to)
+      // 지금은 서버 응답을 받은 뒤에야 화면이 바뀐다. 200~800ms 동안 카드가 그대로 있다.
+      // 이 체감 지연을 없애는 것이 다음 커밋의 낙관적 업데이트다.
+      setState((current) =>
+        current.status === 'ready'
+          ? {
+              ...current,
+              candidates: current.candidates.map((item) =>
+                item.id === updated.id ? updated : item,
+              ),
+            }
+          : current,
+      )
+    } catch (cause) {
+      setMoveError(`${(cause as Error).message} ${candidate.name}님은 그대로 있습니다.`)
+    } finally {
+      setPendingId(null)
+    }
+  }
+
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
         <h1>채용 파이프라인 보드</h1>
+        {/* 이동 실패 안내. 커밋 7에서 토스트로 바뀐다. */}
+        {moveError && (
+          <p className={styles.moveError} role="alert">
+            {moveError}
+          </p>
+        )}
+
         {state.status === 'ready' && (
           <span className={styles.total}>전체 {state.candidates.length}명</span>
         )}
@@ -75,6 +123,13 @@ export default function App() {
         />
       )}
 
+      {/* 이동 실패 안내. 커밋 7에서 토스트로 바뀐다. */}
+      {moveError && (
+        <p className={styles.moveError} role="alert">
+          {moveError}
+        </p>
+      )}
+
       {state.status === 'ready' &&
         (state.candidates.length === 0 ? (
           <StateView
@@ -84,7 +139,14 @@ export default function App() {
         ) : (
           <Board
             candidates={state.candidates}
-            renderCard={(candidate) => <Card key={candidate.id} candidate={candidate} />}
+            renderCard={(candidate) => (
+              <Card
+                key={candidate.id}
+                candidate={candidate}
+                onMove={handleMove}
+                pending={pendingId === candidate.id}
+              />
+            )}
           />
         ))}
     </div>
