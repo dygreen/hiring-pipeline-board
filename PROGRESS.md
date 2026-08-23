@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 2 `feat(mock-api)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 3 `feat(board-layout)` 준비 완료 (미커밋)
 
 ---
 
@@ -12,7 +12,7 @@
 - [x] 0  `docs(rules)`            CLAUDE.md · AGENTS.md · PROGRESS.md · docs/PLAN.md   ← **지금 여기**
 - [x] 1  `chore(setup)`           Vite + React + TS, 린트, 폴더 구조, README 뼈대
 - [x] 2  `feat(mock-api)`         MSW + localStorage persist + seed 1,000건 + 지연/실패
-- [ ] 3  `feat(board-layout)`     5단계 컬럼 레이아웃
+- [x] 3  `feat(board-layout)`     5단계 컬럼 레이아웃
 - [ ] 4  `feat(card-list)`        지원자 카드
 - [ ] 5  `feat(loading-error-empty)`  로딩 / 에러+재시도 / 빈 상태
 - [ ] 6  `feat(stage-move)`       액션 버튼 이동 + PATCH persist
@@ -32,15 +32,14 @@
 
 ## 지금 하던 것
 
-커밋 2 `feat(mock-api)` 완료, **커밋 승인 대기 중**.
+커밋 3 `feat(board-layout)` 완료, **커밋 승인 대기 중**.
 
-MSW 2.15. `config`(지연·실패율 + URL 오버라이드) / `seed`(고정 시드 1,000건) /
-`db`(메모리 1차 + localStorage 미러) / `handlers`(GET 목록, PATCH 단계) 구성.
-`src/App.tsx`는 mock 응답을 눈으로 확인하기 위한 임시 화면이며 커밋 3에서 보드로 대체된다.
+`Board.tsx`(단계별 그룹핑) / `Column.tsx`(헤더·개수·본문) / `Board.module.css`.
+카드는 `renderCard` prop으로 주입받는 구조라 커밋 4에서 자리표시자만 교체하면 된다.
 
-검증: 새로고침 유지 / 실패 주입 503 후 서버 상태 불변 / 지연 279~802ms / 손상 데이터 재시드 확인.
+검증: 1440×900에서 컬럼 5개 폭 분배, 표시 개수 = 실제 카드 수, 가로·세로 스크롤 동작.
 
-다음: 커밋 3 `feat(board-layout)` — 5단계 컬럼 레이아웃
+다음: 커밋 4 `feat(card-list)` — 지원자 카드 (이름·직무·지원일·현재 단계)
 
 ---
 
@@ -82,4 +81,6 @@ _(막힌 것·미해결 버그·사람 확인이 필요한 것을 여기 적는�
 | 1,000건 컬럼 DOM 노드 수 | — | — | 가상 스크롤 도입 전/후 |
 | 검색 입력 지연 | — | — | 1,000건 기준 |
 | mock 지연 실측 | — | 279~802ms | 커밋 2, GET 6회 |
+| 전체 DOM 노드 (1,000건) | 1,044 | — | 커밋 3 기준값. 커밋 14에서 비교 |
+| 서류검토 컬럼 카드 노드 | 457 | — | 표시 개수와 동일 = 전부 렌더됨 |
 | 단계 분포 (1,000건) | — | 457/198/74/112/159 | 서류검토/면접/처우협의/최종합격/불합격 |
