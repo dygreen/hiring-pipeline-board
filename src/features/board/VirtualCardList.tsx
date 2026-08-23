@@ -34,6 +34,13 @@ interface VirtualCardListProps {
 export function VirtualCardList({ candidates, renderCard, stage }: VirtualCardListProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  /*
+   * React Compiler가 `useVirtualizer`를 메모이즈 대상에서 제외한다고 경고한다.
+   * 이 훅이 돌려주는 함수들은 스크롤 위치에 따라 매번 달라져야 해서 메모이즈하면 안 되는 값이고,
+   * 컴파일러가 이 컴포넌트를 최적화에서 빼는 것이 의도한 동작이다.
+   * 목록 항목은 아래 `getVirtualItems()` 결과로만 그려지므로 최적화가 빠져도 문제되지 않는다.
+   */
+  // oxlint-disable-next-line react/incompatible-library
   const virtualizer = useVirtualizer({
     count: candidates.length,
     getScrollElement: () => scrollRef.current,
