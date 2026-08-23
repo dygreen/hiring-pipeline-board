@@ -14,6 +14,12 @@ export async function startMockApi(): Promise<void> {
   const { worker } = await import('./browser')
 
   await worker.start({
+    /*
+     * 서비스 워커 파일 경로를 base에 맞춘다.
+     * GitHub Pages처럼 하위 경로로 서빙되면 `/mockServiceWorker.js`는 404가 되고,
+     * 그러면 mock이 뜨지 않아 앱이 아무 데이터도 받지 못한다.
+     */
+    serviceWorker: { url: `${import.meta.env.BASE_URL}mockServiceWorker.js` },
     // 앱이 보내지 않은 요청(예: Vite HMR)까지 경고로 찍히는 것을 막는다.
     onUnhandledRequest: 'bypass',
     quiet: true,
