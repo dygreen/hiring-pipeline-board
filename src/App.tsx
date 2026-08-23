@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Board } from './features/board/Board'
 import { FilterBar } from './features/board/FilterBar'
@@ -10,6 +10,7 @@ import {
 } from './features/board/filterCandidates'
 import { Card } from './features/board/Card'
 import { useMoveStage } from './features/board/useMoveStage'
+import { useBoardKeyboard } from './features/board/useBoardKeyboard'
 import { BoardSkeleton } from './components/BoardSkeleton'
 import { StateView } from './components/StateView'
 import { DetailPanel } from './features/detail/DetailPanel'
@@ -56,9 +57,21 @@ export default function App() {
     },
   })
 
-  const handleMove = (candidate: Candidate, to: Stage) => {
-    move.mutate({ candidate, to })
-  }
+  const handleMove = useCallback(
+    (candidate: Candidate, to: Stage) => {
+      move.mutate({ candidate, to })
+    },
+    [move],
+  )
+
+  const handleSelect = useCallback((candidate: Candidate) => setSelectedId(candidate.id), [])
+
+  const keyboard = useBoardKeyboard({
+    onMove: handleMove,
+    onSelect: handleSelect,
+    // 막힌 방향을 눌렀을 때 아무 일도 일어나지 않으면 키가 안 먹는 건지 끝인 건지 알 수 없다.
+    onBlocked: (message) => push(message),
+  })
 
   const all = candidates.data
   // 직무 목록은 전체 기준으로 만든다. 걸러진 결과로 만들면 필터를 쓸수록 선택지가 사라진다.
@@ -75,6 +88,15 @@ export default function App() {
    */
   const selected = selectedId ? (all?.find((c) => c.id === selectedId) ?? null) : null
 
+  /*
+   * 목록이 다시 그려진 뒤에 포커스를 이어준다.
+   * 키보드로 카드를 옮기면 그 카드는 다른 컬럼에 다시 그려지고 원래 노드는 사라진다.
+   * 이어주지 않으면 포커스가 body로 떨어져 카드 하나 옮길 때마다 처음부터 다시 찾아야 한다.
+   */
+  useEffect(() => {
+    keyboard.focusPending()
+  }, [visible, keyboard])
+
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -89,6 +111,26 @@ export default function App() {
           />
         )}
       </header>
+
+      {all && all.length > 0 && (
+        <p className={styles.shortcuts}>
+          <span>
+            <kbd>Tab</kbd> 컬럼 이동
+          </span>
+          <span>
+            <kbd>↑</kbd> <kbd>↓</kbd> 카드 이동
+          </span>
+          <span>
+            <kbd>←</kbd> <kbd>→</kbd> 단계 옮기기
+          </span>
+          <span>
+            <kbd>Enter</kbd> 상세
+          </span>
+          <span>
+            <kbd>Delete</kbd> 불합격
+          </span>
+        </p>
+      )}
 
       {candidates.isPending && <BoardSkeleton />}
 
@@ -118,12 +160,15 @@ export default function App() {
         ) : (
           <Board
             candidates={visible}
-            renderCard={(candidate) => (
+            renderCard={(candidate, indexInColumn) => (
               <Card
                 key={candidate.id}
                 candidate={candidate}
                 onMove={handleMove}
-                onSelect={(item) => setSelectedId(item.id)}
+                onSelect={handleSelect}
+                isTabStop={keyboard.isRovingTarget(candidate, indexInColumn)}
+                onFocus={keyboard.handleFocus}
+                onKeyDown={keyboard.handleKeyDown}
               />
             )}
           />

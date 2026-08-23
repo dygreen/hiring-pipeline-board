@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from 'react'
 import { STAGE_LABEL, type Candidate, type Stage } from '../../types/candidate'
 import { formatAppliedDateFull, formatAppliedDateShort } from '../../lib/date'
 import { REJECTED, canReject, nextStage, previousStage } from './stageRules'
@@ -7,9 +8,13 @@ interface CardProps {
   candidate: Candidate
   onMove: (candidate: Candidate, to: Stage) => void
   onSelect: (candidate: Candidate) => void
+  /** 이 카드가 컬럼의 Tab 진입점인가 (roving tabindex). */
+  isTabStop: boolean
+  onFocus: (candidate: Candidate) => void
+  onKeyDown: (event: KeyboardEvent<HTMLElement>, candidate: Candidate) => void
 }
 
-export function Card({ candidate, onMove, onSelect }: CardProps) {
+export function Card({ candidate, onMove, onSelect, isTabStop, onFocus, onKeyDown }: CardProps) {
   const { name, position, appliedAt, stage } = candidate
 
   const previous = previousStage(stage)
@@ -28,12 +33,20 @@ export function Card({ candidate, onMove, onSelect }: CardProps) {
       // 포커스 복원(커밋 13)과 가상 스크롤(커밋 14)에서 카드를 다시 찾을 때도 필요하다.
       data-id={candidate.id}
       aria-label={`${name} · ${position}`}
+      /*
+       * 컬럼당 하나의 카드만 Tab 대상이 된다(roving tabindex).
+       * 전부 Tab 순서에 두면 1,000건 기준 마지막 카드까지 4,000번을 눌러야 한다.
+       */
+      tabIndex={isTabStop ? 0 : -1}
+      onFocus={() => onFocus(candidate)}
+      onKeyDown={(event) => onKeyDown(event, candidate)}
     >
       <button
         type="button"
         className={styles.summary}
         onClick={() => onSelect(candidate)}
         aria-label={`${name} 상세 보기`}
+        tabIndex={-1}
       >
         <span className={styles.name} title={name}>
           {name}
@@ -66,6 +79,7 @@ export function Card({ candidate, onMove, onSelect }: CardProps) {
         <button
           type="button"
           className={styles.action}
+          tabIndex={-1}
           disabled={!previous}
           onClick={() => previous && onMove(candidate, previous)}
           aria-label={previous ? `${name}을(를) ${STAGE_LABEL[previous]}(으)로 이동` : undefined}
@@ -75,6 +89,7 @@ export function Card({ candidate, onMove, onSelect }: CardProps) {
         <button
           type="button"
           className={styles.action}
+          tabIndex={-1}
           disabled={!next}
           onClick={() => next && onMove(candidate, next)}
           aria-label={next ? `${name}을(를) ${STAGE_LABEL[next]}(으)로 이동` : undefined}
@@ -84,6 +99,7 @@ export function Card({ candidate, onMove, onSelect }: CardProps) {
         <button
           type="button"
           className={`${styles.action} ${styles.reject}`}
+          tabIndex={-1}
           disabled={!rejectable}
           onClick={() => onMove(candidate, REJECTED)}
           aria-label={`${name}을(를) 불합격으로 이동`}

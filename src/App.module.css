@@ -30,3 +30,29 @@
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/*
+ * 키보드 조작 안내.
+ * 방향키로 단계를 옮길 수 있다는 것은 화면을 봐서는 알 수 없다.
+ * 안내가 없으면 만들어둔 기능이 없는 것과 같다.
+ */
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.shortcuts kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+}

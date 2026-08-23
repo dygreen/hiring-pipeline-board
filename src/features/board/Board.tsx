@@ -5,7 +5,8 @@ import styles from './Board.module.css'
 
 interface BoardProps {
   candidates: Candidate[]
-  renderCard: (candidate: Candidate) => React.ReactNode
+  /** `indexInColumn`은 roving tabindex 대상을 정하는 데 쓰인다. */
+  renderCard: (candidate: Candidate, indexInColumn: number) => React.ReactNode
 }
 
 /**
