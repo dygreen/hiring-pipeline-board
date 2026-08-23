@@ -44,6 +44,27 @@
   border-color: var(--danger);
 }
 
+/*
+ * 카드 요약부를 버튼으로 만든다. div에 onClick을 달면 키보드로 열 수 없고
+ * 스크린리더에도 "누를 수 있는 것"으로 보이지 않는다.
+ */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.summary:hover .name {
+  color: var(--accent);
+}
+
 .name {
   font-size: 0.875rem;
   font-weight: 600;

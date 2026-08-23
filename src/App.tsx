@@ -12,6 +12,7 @@ import { Card } from './features/board/Card'
 import { useMoveStage } from './features/board/useMoveStage'
 import { BoardSkeleton } from './components/BoardSkeleton'
 import { StateView } from './components/StateView'
+import { DetailPanel } from './features/detail/DetailPanel'
 import { ToastRegion } from './components/ToastRegion'
 import { useToasts } from './components/useToasts'
 import { fetchCandidates } from './api/candidates'
@@ -30,6 +31,7 @@ export default function App() {
    * debounce와 달리 "몇 밀리초를 기다릴지"를 정할 필요가 없다 — 한가해지면 바로 처리한다.
    */
   const deferredFilter = useDeferredValue(filter)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const candidates = useQuery({
     queryKey: candidatesKey,
@@ -66,6 +68,12 @@ export default function App() {
     [all, deferredFilter],
   )
   const filtering = isFilterActive(deferredFilter)
+  /*
+   * 선택된 지원자는 id로 들고 캐시에서 다시 찾는다.
+   * 객체를 그대로 담아두면 그 카드를 이동시켰을 때 패널은 옛 단계를 계속 보여준다.
+   * 전체 목록(all)에서 찾는 이유는, 필터를 바꿔 목록에서 사라져도 열어둔 패널이 닫히지 않게 하기 위함이다.
+   */
+  const selected = selectedId ? (all?.find((c) => c.id === selectedId) ?? null) : null
 
   return (
     <div className={styles.shell}>
@@ -111,10 +119,19 @@ export default function App() {
           <Board
             candidates={visible}
             renderCard={(candidate) => (
-              <Card key={candidate.id} candidate={candidate} onMove={handleMove} />
+              <Card
+                key={candidate.id}
+                candidate={candidate}
+                onMove={handleMove}
+                onSelect={(item) => setSelectedId(item.id)}
+              />
             )}
           />
         ))}
+
+      {selected && (
+        <DetailPanel candidate={selected} onClose={() => setSelectedId(null)} onMove={handleMove} />
+      )}
 
       <ToastRegion toasts={toasts} onDismiss={dismiss} />
     </div>

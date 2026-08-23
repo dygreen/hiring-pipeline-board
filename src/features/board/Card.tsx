@@ -6,9 +6,10 @@ import styles from './Card.module.css'
 interface CardProps {
   candidate: Candidate
   onMove: (candidate: Candidate, to: Stage) => void
+  onSelect: (candidate: Candidate) => void
 }
 
-export function Card({ candidate, onMove }: CardProps) {
+export function Card({ candidate, onMove, onSelect }: CardProps) {
   const { name, position, appliedAt, stage } = candidate
 
   const previous = previousStage(stage)
@@ -28,22 +29,29 @@ export function Card({ candidate, onMove }: CardProps) {
       data-id={candidate.id}
       aria-label={`${name} · ${position}`}
     >
-      <span className={styles.name} title={name}>
-        {name}
-      </span>
-      <div className={styles.meta}>
-        <span className={styles.position} title={position}>
-          {position}
+      <button
+        type="button"
+        className={styles.summary}
+        onClick={() => onSelect(candidate)}
+        aria-label={`${name} 상세 보기`}
+      >
+        <span className={styles.name} title={name}>
+          {name}
         </span>
-        {/*
-         * time 요소로 감싸면 기계가 읽을 수 있는 날짜가 dateTime에 남는다.
-         * 화면에는 "8월 1일", 읽어줄 때는 "2026년 8월 1일 지원".
-         */}
-        <time className={styles.appliedAt} dateTime={appliedAt}>
-          <span aria-hidden="true">{formatAppliedDateShort(appliedAt)}</span>
-          <span className="sr-only">{formatAppliedDateFull(appliedAt)} 지원</span>
-        </time>
-      </div>
+        <div className={styles.meta}>
+          <span className={styles.position} title={position}>
+            {position}
+          </span>
+          {/*
+           * time 요소로 감싸면 기계가 읽을 수 있는 날짜가 dateTime에 남는다.
+           * 화면에는 "8월 1일", 읽어줄 때는 "2026년 8월 1일 지원".
+           */}
+          <time className={styles.appliedAt} dateTime={appliedAt}>
+            <span aria-hidden="true">{formatAppliedDateShort(appliedAt)}</span>
+            <span className="sr-only">{formatAppliedDateFull(appliedAt)} 지원</span>
+          </time>
+        </div>
+      </button>
       {/*
        * 현재 단계는 컬럼 위치로 이미 드러나므로 화면에 또 적지 않는다.
        * 다만 카드만 따로 읽는 스크린리더 사용자에게는 그 맥락이 없어서 텍스트로 남긴다.

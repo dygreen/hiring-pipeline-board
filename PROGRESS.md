@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 11 `feat(search-filter)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 12 `feat(detail-panel)` 준비 완료 (미커밋) — **Must 6개 완료**
 
 ---
 
@@ -21,7 +21,7 @@
 - [x] 9  `feat(race-condition)`   카드별 직렬 큐 + seq 기반 stale 응답 폐기
 - [x] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
 - [x] 11 `feat(search-filter)`    이름 검색 + 직무 필터
-- [ ] 12 `feat(detail-panel)`     사이드 패널 상세
+- [x] 12 `feat(detail-panel)`     사이드 패널 상세
 - [ ] 13 `feat(a11y-keyboard)`    키보드 내비게이션 + aria-live + 포커스 관리
 - [ ] 14 `feat(virtualization)`   컬럼 가상 스크롤 (1,000건)
 - [ ] 15 `feat(undo)`             되돌리기
@@ -32,15 +32,15 @@
 
 ## 지금 하던 것
 
-커밋 11 `feat(search-filter)` 완료, **커밋 승인 대기 중**.
+커밋 12 `feat(detail-panel)` 완료, **커밋 승인 대기 중**. 이걸로 **필수 요구사항 6개 전부 충족**.
 
-`filterCandidates.ts`(순수) + `FilterBar.tsx` + `useDeferredValue`.
-debounce 대신 `useDeferredValue`를 쓴 이유: 대기 시간을 숫자로 못 박지 않아도 된다.
-이름 검색에 공백 제거 + NFC 정규화(macOS NFD 입력 대응).
+`DetailPanel.tsx` + `useFocusTrap.ts`. 카드 요약부를 button으로 바꿔 키보드 진입 가능하게.
+선택은 객체가 아니라 id로 들고 캐시에서 다시 찾는다(이동 시 패널 내용이 따라감).
 
-성능 실측: 구현을 되돌려 A/B 비교. 최대 입력 지연 156ms → 58ms, 필터 해제 시 156ms → 33ms.
+**찾은 결함**: 패널에서 이동시키면 원래 버튼이 언마운트되어 닫을 때 포커스가 body로 떨어졌다.
+`resolveFallback`으로 같은 data-id의 새 카드를 찾아 복원.
 
-다음: 커밋 12 `feat(detail-panel)` — 사이드 패널 상세
+다음: 커밋 13 `feat(a11y-keyboard)` — 카드 단위 포커스 + 방향키 이동 + aria-live
 
 ---
 
