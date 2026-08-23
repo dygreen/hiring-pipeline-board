@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 7 `feat(optimistic-update)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 8 `fix(optimistic-update)` 준비 완료 (미커밋)
 
 ---
 
@@ -17,7 +17,7 @@
 - [x] 5  `feat(loading-error-empty)`  로딩 / 에러+재시도 / 빈 상태
 - [x] 6  `feat(stage-move)`       액션 버튼 이동 + PATCH persist
 - [x] 7  `feat(optimistic-update)`  낙관적 반영 + 실패 롤백 + 피드백
-- [ ] 8  `fix(optimistic-update)`   연속 이동 시 롤백이 두 단계 전으로 가던 문제
+- [x] 8  `fix(optimistic-update)`   연속 이동 시 롤백이 두 단계 전으로 가던 문제
 - [ ] 9  `feat(race-condition)`   카드별 직렬 큐 + seq 기반 stale 응답 폐기
 - [ ] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
 - [ ] 11 `feat(search-filter)`    이름 검색 + 직무 필터
@@ -32,17 +32,19 @@
 
 ## 지금 하던 것
 
-커밋 7 `feat(optimistic-update)` 완료, **커밋 승인 대기 중**.
+커밋 8 `fix(optimistic-update)` 완료, **커밋 승인 대기 중**.
 
-TanStack Query 도입. `useMoveStage`에서 **필드 단위 롤백**(`{id, from}`)을 쓴다.
-공식 레시피의 전체 스냅샷 롤백은 연속 이동 시 두 단계 전으로 되돌아가고
-그 사이 다른 카드 변경까지 되돌리므로 채택하지 않았다.
-`onSettled` 무효화도 빼고 성공 응답의 카드로만 교체한다(1,000건 재조회 + 늦은 목록이 덮어쓰는 문제).
+카드별 요청 순번(seq)을 `useRef` Map에 두고, 응답 도착 시 최신 순번일 때만 캐시에 반영.
+서버 `revision`을 쓰지 않은 이유: 실패한 요청은 revision을 올리지 않아 옛 실패를 구분할 수 없다.
+지나간 요청의 실패 토스트는 억제 — 문구가 실제 카드 위치와 어긋나 틀린 정보가 된다.
 
-**재현한 결함**: 요청1 실패가 요청2 성공보다 늦게 도착하면 확정 상태를 덮어쓴다.
-화면 서류검토 / 서버 처우협의로 어긋남. 커밋 8에서 수정.
+검증: 재현했던 시나리오에서 화면·서버 모두 처우협의로 일치. 단일 실패 롤백·3연타 회귀 통과.
 
-다음: 커밋 8 `fix(optimistic-update)` — 늦게 도착한 응답 무시
+이어서 `chore(mock-api)`: `?failRate=1`이 목록 조회까지 실패시켜 카드가 안 보인다는 지적을 받고
+`moveFailRate` / `fetchFailRate`로 작업별 실패율을 분리했다.
+검증 장치를 만들어놓고 자동화로만 쓸 수 있게 만들었던 것.
+
+다음: 커밋 9 `feat(race-condition)` — 카드별 직렬 큐로 겹침 자체 제거
 
 ---
 
@@ -60,6 +62,8 @@ _(막힌 것·미해결 버그·사람 확인이 필요한 것을 여기 적는�
   커밋 13에서 한 번은 실제로 들어볼 것
 - `codex exec` 실행 시 `unknown variant 'max'` 에러 로그가 함께 찍힌다(CLI-서버 버전 불일치).
   리뷰 결과 자체는 정상이라 그대로 쓰는 중
+- `useMoveStage`에 대한 codex 교차 리뷰가 10분 넘게 응답 없이 실행 중이다.
+  결과가 오면 커밋 9에 반영할 것. 응답이 끝내 없으면 그 사실도 기록한다
 - mock API는 여전히 어떤 단계로든 이동을 허용한다. 규칙은 클라이언트에만 있다.
   실제 서버라면 서버가 검증해야 하지만, 이 과제에서는 UI 동작이 평가 대상이라 클라이언트에 뒀다.
   `DECISIONS.md`에 적을 것

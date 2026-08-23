@@ -1,6 +1,6 @@
 import { HttpResponse, delay, http } from 'msw'
 import { STAGES, type Stage } from '../types/candidate'
-import { pickDelay, readMockConfig, shouldFail } from './config'
+import { pickDelay, readMockConfig, shouldFail, type MockOperation } from './config'
 import { listCandidates, updateStage } from './db'
 
 export interface ApiError {
@@ -13,8 +13,8 @@ function isStage(value: unknown): value is Stage {
 }
 
 /** 요청마다 설정을 다시 읽는다. URL 쿼리를 바꾸면 새로고침 없이도 반영되게 하기 위해서다. */
-async function simulateNetwork(): Promise<{ failed: boolean }> {
-  const config = readMockConfig()
+async function simulateNetwork(operation: MockOperation): Promise<{ failed: boolean }> {
+  const config = readMockConfig(operation)
   await delay(pickDelay(config))
   return { failed: shouldFail(config) }
 }
@@ -29,7 +29,7 @@ export const handlers = [
    * 검색·필터는 클라이언트에서 처리하므로 전체를 내려준다. 이유는 DECISIONS.md 참조.
    */
   http.get('/api/candidates', async () => {
-    const { failed } = await simulateNetwork()
+    const { failed } = await simulateNetwork('fetch')
 
     if (failed) {
       return HttpResponse.json<ApiError>(
@@ -53,7 +53,7 @@ export const handlers = [
       )
     }
 
-    const { failed } = await simulateNetwork()
+    const { failed } = await simulateNetwork('move')
 
     if (failed) {
       return HttpResponse.json<ApiError>(
