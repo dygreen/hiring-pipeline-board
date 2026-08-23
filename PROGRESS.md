@@ -3,14 +3,14 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 0 준비 완료 (미커밋)
+**최종 갱신**: 커밋 1 `chore(setup)` 준비 완료 (미커밋)
 
 ---
 
 ## 커밋 체크리스트
 
-- [ ] 0  `docs(rules)`            CLAUDE.md · AGENTS.md · PROGRESS.md · docs/PLAN.md   ← **지금 여기**
-- [ ] 1  `chore(setup)`           Vite + React + TS, 린트, 폴더 구조, README 뼈대
+- [x] 0  `docs(rules)`            CLAUDE.md · AGENTS.md · PROGRESS.md · docs/PLAN.md   ← **지금 여기**
+- [x] 1  `chore(setup)`           Vite + React + TS, 린트, 폴더 구조, README 뼈대
 - [ ] 2  `feat(mock-api)`         MSW + localStorage persist + seed 1,000건 + 지연/실패
 - [ ] 3  `feat(board-layout)`     5단계 컬럼 레이아웃
 - [ ] 4  `feat(card-list)`        지원자 카드
@@ -32,12 +32,16 @@
 
 ## 지금 하던 것
 
-커밋 0 — AI 협업 규칙 문서 작성 완료, **커밋 승인 대기 중**.
+커밋 1 `chore(setup)` 완료, **커밋 승인 대기 중**.
 
-작성한 것: `CLAUDE.md`(정본) · `AGENTS.md`(포인터) · `PROGRESS.md`(이 파일) · `PROMPTS.md`(로그 시작) · `docs/PLAN.md` · `.gitignore`
-저장소: https://github.com/dygreen/hiring-pipeline-board (public, 생성 완료 / 아직 푸시 전)
+Vite 8 + React 19.2 + TS 6.0 초기화. Vitest·Testing Library·Prettier 추가.
+`src/{features,components,mocks,types,lib,test}` 구조와 `src/types/candidate.ts` 도메인 타입 작성.
 
-다음: 커밋 0 승인 → 커밋 1 `chore(setup)` (Vite + React + TS 초기화)
+의존성은 필요한 커밋에서 각각 추가한다 — MSW는 커밋 2, TanStack Query는 커밋 7, react-virtual은 커밋 14.
+
+검증: `typecheck` / `build` / `lint` / `test` 전부 통과.
+
+다음: 커밋 2 `feat(mock-api)` — MSW 핸들러 + localStorage 백킹 + seed 1,000건 + 지연 200~800ms / 실패 15%
 
 ---
 
@@ -46,6 +50,8 @@
 _(막힌 것·미해결 버그·사람 확인이 필요한 것을 여기 적는다. 3회 실패로 중단한 시도도 여기 남긴다.)_
 
 - 규칙 문서만 읽고 새 세션이 작업을 이어갈 수 있는지 미검증 — 구현이 몇 단계 진행된 뒤 실제로 확인할 것
+- `npm test`에 `--passWithNoTests`가 붙어 있다. 커밋 10에서 실제 테스트가 들어온 뒤,
+  테스트 파일이 사라져도 통과해버리는 문제가 없는지 확인할 것
 
 ---
 

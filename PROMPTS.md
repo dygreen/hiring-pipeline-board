@@ -61,3 +61,58 @@ LLM의 실패 유형 중 **컨텍스트 손실** — 긴 작업 도중 초기 �
 
 **검증하지 않은 것**: 실제로 새 세션을 열어 이 문서만 읽고 작업이 이어지는지는 아직 확인하지 못했다.
 구현이 몇 단계 진행된 뒤 확인하고 결과를 여기 추가한다.
+
+---
+
+## [setup] 프로젝트 초기화
+
+**검증 강도**: 경량 (구현 → 코드 정독)
+
+### 프롬프트 1
+
+> 커밋 1 `chore(setup)` 진행. Vite + React 19 + TS 초기화, 린트, 폴더 구조, README 뼈대.
+> 의존성은 필요한 커밋에서 각각 추가할 것 — MSW는 커밋 2, TanStack Query는 커밋 7, react-virtual은 커밋 14.
+
+### AI 출력 요지
+
+`npm create vite`로 react-ts 템플릿 생성 후, Vitest·Testing Library·Prettier를 추가하고
+`src/{features,components,mocks,types,lib,test}`로 폴더 구조를 정하고, `src/types/candidate.ts` 도메인 타입과 README 뼈대 작성.
+
+### 리뷰 / 검증
+
+**의존성을 한 번에 다 깔지 않기로 한 것은 의도적이다.**
+초기 설정에서 필요한 패키지를 전부 설치하면 편하지만, 커밋 히스토리만 봐서는
+어떤 라이브러리가 어떤 문제 때문에 들어왔는지 알 수 없다.
+MSW는 mock API를 만들 때, TanStack Query는 낙관적 업데이트를 붙일 때 각각 들어오게 했다.
+
+**`npm run build`가 실패했다.** `vite.config.ts`에서 `test` 키를 인식하지 못했다.
+
+```
+vite.config.ts(6,3): error TS2769: No overload matches this call.
+  Object literal may only specify known properties, and 'test' does not exist in type 'UserConfigExport'
+```
+
+원인은 `defineConfig`를 `vite`에서 import한 것이었다. Vitest 4는 `vitest/config`의 `defineConfig`를 써야
+`test` 키가 타입에 포함된다. AI 초안이 `vite`에서 가져오고 있었다.
+→ import 출처를 `vitest/config`로 교체.
+
+이어서 `/// <reference types="vitest/config" />`를 함께 넣었는데 린트가 잡았다.
+`vitest/config`에서 직접 import하면 타입이 이미 잡히므로 삼중 슬래시 참조는 **불필요한 중복**이었다.
+→ 삭제. 삭제 후 빌드·린트 모두 통과하는 것을 확인했다.
+
+**`npm test`가 exit 1로 실패하는 것을 발견했다.** 아직 테스트 파일이 없어서다.
+테스트는 커밋 10에서 들어오는데 그때까지 `npm test`가 빨간불이면
+"원래 실패하는 것"으로 취급하게 되어 진짜 실패를 놓친다.
+→ `--passWithNoTests`를 붙였다. 테스트가 생긴 뒤에도 동작이 달라지지 않으므로 그대로 둔다.
+
+**`STAGES` 배열 순서에 주석으로 계약을 명시했다.**
+이 배열은 단순한 목록이 아니라 **보드 컬럼 순서이자 이동 순서**를 동시에 정의한다.
+나중에 누군가 알파벳순으로 정렬하면 화면과 이동 로직이 같이 깨진다. 주석 한 줄로 의도를 고정했다.
+
+**스캐폴드 잔재를 정리했다.** Vite 템플릿의 `public/icons.svg`와 `src/App.css`, `src/assets/`는
+기본 App.tsx를 교체하면서 참조가 사라졌다. 쓰이지 않는 파일이 저장소에 남으면
+나중에 읽는 사람이 "어디선가 쓰이겠지"라고 생각하게 된다. → 삭제.
+`public/favicon.svg`는 `index.html`이 참조하므로 남겼다.
+
+**검증한 것**: `npm run typecheck` / `npm run build` / `npm run lint` / `npm test` 전부 통과.
+**검증하지 않은 것**: 화면 렌더는 아직 제목뿐이라 브라우저 확인을 생략했다. 보드가 그려지는 커밋 3에서 확인한다.
