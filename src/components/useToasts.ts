@@ -1,9 +1,16 @@
 import { useCallback, useRef, useState } from 'react'
 
+export interface ToastAction {
+  label: string
+  onClick: () => void
+}
+
 export interface Toast {
   id: number
   message: string
   tone: 'info' | 'error'
+  /** 토스트에서 바로 실행할 동작(되돌리기 등). */
+  action?: ToastAction
 }
 
 const AUTO_DISMISS_MS = 5_000
@@ -24,9 +31,9 @@ export function useToasts() {
   }, [])
 
   const push = useCallback(
-    (message: string, tone: Toast['tone'] = 'info') => {
+    (message: string, tone: Toast['tone'] = 'info', action?: ToastAction) => {
       const id = nextId.current++
-      setToasts((list) => [...list, { id, message, tone }])
+      setToasts((list) => [...list, { id, message, tone, action }])
       timers.current.set(
         id,
         setTimeout(() => dismiss(id), AUTO_DISMISS_MS),

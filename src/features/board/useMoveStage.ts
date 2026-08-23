@@ -8,6 +8,13 @@ import { createMoveCoordinator, type MoveTicket } from './moveQueue'
 export interface MoveInput {
   candidate: Candidate
   to: Stage
+  /**
+   * 되돌리기로 실행된 이동인가.
+   *
+   * 되돌리기가 다시 "되돌릴 수 있는 이동"으로 기록되면 Cmd+Z가 토글이 된다.
+   * 요구사항은 "방금 한 이동을 취소"라는 한 단계이므로, 되돌리기는 기록하지 않는다.
+   */
+  isUndo?: boolean
 }
 
 interface MoveContext {

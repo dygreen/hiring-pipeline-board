@@ -22,6 +22,18 @@ export function ToastRegion({ toasts, onDismiss }: ToastRegionProps) {
           role={toast.tone === 'error' ? 'alert' : 'status'}
         >
           <span className={styles.message}>{toast.message}</span>
+          {toast.action && (
+            <button
+              type="button"
+              className={styles.action}
+              onClick={() => {
+                toast.action?.onClick()
+                onDismiss(toast.id)
+              }}
+            >
+              {toast.action.label}
+            </button>
+          )}
           <button type="button" className={styles.dismiss} onClick={() => onDismiss(toast.id)}>
             닫기
           </button>

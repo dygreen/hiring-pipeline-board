@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 14 `feat(virtualization)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 15 `feat(undo)` 준비 완료 (미커밋) — **Must 6 + Should 5 전부 완료**
 
 ---
 
@@ -24,7 +24,7 @@
 - [x] 12 `feat(detail-panel)`     사이드 패널 상세
 - [x] 13 `feat(a11y-keyboard)`    키보드 내비게이션 + aria-live + 포커스 관리
 - [x] 14 `feat(virtualization)`   컬럼 가상 스크롤 (1,000건)
-- [ ] 15 `feat(undo)`             되돌리기
+- [x] 15 `feat(undo)`             되돌리기
 - [ ] 16 `docs(decisions)`        DECISIONS.md 정리
 - [ ] 17 `docs(readme)`           실행법·스택·성능 수치·배포 링크
 
@@ -32,17 +32,15 @@
 
 ## 지금 하던 것
 
-커밋 14 `feat(virtualization)` 완료, **커밋 승인 대기 중**.
+커밋 15 `feat(undo)` 완료, **커밋 승인 대기 중**. 이걸로 **필수 6개 + 도전 5개 전부 구현 완료**.
 
-`VirtualCardList.tsx`. 키보드 이동을 DOM 형제 탐색 → 순번(`data-index`/`data-count`) 계산으로 전환.
+`useUndo.ts` + 토스트 "되돌리기" 버튼 + `Cmd/Ctrl+Z`.
+커밋 6에서 `canMove` 주석에 적어둔 "Undo는 규칙 검사를 타지 않는다"가 여기서 값을 했다.
 
-**세 번 틀린 끝에 원인을 찾았다.** `.columnBody`가 `display: flex`라 전체 높이 스페이서가
-flex 항목으로 축소되어 scrollHeight가 53,012 → 1,510이 됐다. 스크롤이 714px에서 멈춰 있었으니
-화면 밖 행은 아무리 기다려도 그려질 수 없었다. 전용 클래스(`display: block`)로 분리해 해결.
+검증에서 찾은 것: 되돌리기가 다시 기록되어 `Cmd+Z` 두 번이면 토글이 됐다.
+`isUndo` 플래그로 되돌리기는 기록하지 않게 수정.
 
-A/B: DOM 13,081 → 996 노드, 카드 1,000 → 65장, 입력 지연 147ms → 44ms, 롱태스크 소멸.
-
-다음: 커밋 15 `feat(undo)` — 되돌리기 (이동 규칙을 우회해야 함)
+다음: 커밋 16 `docs(decisions)` → 커밋 17 `docs(readme)` → 배포
 
 ---
 
