@@ -23,12 +23,15 @@ export default function App() {
     onSuccess: ({ candidate, to }) => {
       push(`${candidate.name}님을 ${STAGE_LABEL[to]}(으)로 옮겼습니다.`)
     },
-    onError: ({ candidate, to }, message) => {
+    onError: ({ candidate, to }, message, restoredTo) => {
       // 실패했을 때 "무엇을 시도했고 지금 어디에 있는지"를 둘 다 알려준다.
       // "이동에 실패했습니다"만 띄우면 카드가 어디로 돌아갔는지 직접 찾아야 한다.
+      //
+      // 클릭 시점의 candidate.stage가 아니라 실제로 되돌린 단계를 쓴다.
+      // 요청이 겹쳤다면 둘이 다를 수 있고, 그때 클릭 시점 값을 쓰면 틀린 위치를 알리게 된다.
       push(
         `${candidate.name}님을 ${STAGE_LABEL[to]}(으)로 옮기지 못했습니다. ` +
-          `${STAGE_LABEL[candidate.stage]}에 그대로 있습니다. (${message})`,
+          `${STAGE_LABEL[restoredTo]}에 그대로 있습니다. (${message})`,
         'error',
       )
     },
