@@ -9,6 +9,8 @@
 > 그래서 이 저장소의 작업 대부분은 **화면이 말하는 것과 서버의 실제 상태를 어긋나지 않게 하는 일**이었다.
 > 판단 과정은 [`DECISIONS.md`](./DECISIONS.md)와 [`PROMPTS.md`](./PROMPTS.md)에 있다.
 
+**배포**: https://dygreen.github.io/hiring-pipeline-board/
+
 ## 실행
 
 ```bash
@@ -91,6 +93,8 @@ npm run dev
 | `?failRate=1`      | 모두 실패                                                |
 | `?delay=0`         | 지연 없음                                                |
 | `?reset=1`         | 저장소를 비우고 다시 시드                                |
+
+배포본에도 그대로 붙는다. 예: `https://dygreen.github.io/hiring-pipeline-board/?moveFailRate=1`
 
 **롤백을 확인하려면**: `?moveFailRate=1`로 접속 → 카드의 이동 버튼 클릭 →
 즉시 옮겨졌다가 제자리로 돌아오고 토스트가 뜬다.

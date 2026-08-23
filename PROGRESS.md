@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 문서 마무리 완료. 배포만 남음
+**최종 갱신**: 전체 완료 (구현·문서·배포)
 
 ---
 
@@ -34,12 +34,14 @@
 
 **구현·문서 완료.** 필수 6개 + 도전 5개 전부, 문서 4종(README/PROMPTS/DECISIONS/PLAN) 작성 완료.
 
-남은 것: 배포(Vercel) → README에 링크 추가.
+배포 완료: https://dygreen.github.io/hiring-pipeline-board/ (GitHub Actions, main 푸시마다 자동)
 
 ### 최종 상태
+
 - 테스트 16개 통과(3회 반복 확인), 타입 체크·린트 경고 0
 - 콘솔 에러 0건, 프로덕션 빌드(`vite preview`)에서 전 기능 재확인
-- 커밋 18개, squash/force-push 없음
+- squash/force-push 없음
+- 배포 워크플로가 typecheck/lint/test/build를 모두 통과해야 올라감
 
 ---
 
