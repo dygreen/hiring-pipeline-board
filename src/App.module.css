@@ -29,13 +29,3 @@
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
-
-.moveError {
-  margin: 0;
-  padding: 8px 12px;
-  font-size: 0.8125rem;
-  color: var(--danger);
-  background: #fdf1f1;
-  border: 1px solid #f3d4d4;
-  border-radius: 6px;
-}

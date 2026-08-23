@@ -3,7 +3,7 @@
 > 새 세션은 [`CLAUDE.md`](./CLAUDE.md) → 이 파일 순서로 읽는다.
 > **이어서 작업할 때 쓸 프롬프트**: `CLAUDE.md와 PROGRESS.md를 읽고, "지금 하던 것"부터 이어서 진행해줘. 커밋은 하지 말고.`
 
-**최종 갱신**: 커밋 6 `feat(stage-move)` 준비 완료 (미커밋)
+**최종 갱신**: 커밋 7 `feat(optimistic-update)` 준비 완료 (미커밋)
 
 ---
 
@@ -16,7 +16,7 @@
 - [x] 4  `feat(card-list)`        지원자 카드
 - [x] 5  `feat(loading-error-empty)`  로딩 / 에러+재시도 / 빈 상태
 - [x] 6  `feat(stage-move)`       액션 버튼 이동 + PATCH persist
-- [ ] 7  `feat(optimistic-update)`  낙관적 반영 + 실패 롤백 + 피드백
+- [x] 7  `feat(optimistic-update)`  낙관적 반영 + 실패 롤백 + 피드백
 - [ ] 8  `fix(optimistic-update)`   연속 이동 시 롤백이 두 단계 전으로 가던 문제
 - [ ] 9  `feat(race-condition)`   카드별 직렬 큐 + seq 기반 stale 응답 폐기
 - [ ] 10 `test(optimistic-rollback)`  롤백·경쟁 상태·큐 순서 테스트
@@ -32,14 +32,17 @@
 
 ## 지금 하던 것
 
-커밋 6 `feat(stage-move)` 완료, **커밋 승인 대기 중**.
+커밋 7 `feat(optimistic-update)` 완료, **커밋 승인 대기 중**.
 
-`stageRules.ts`로 이동 규칙을 함수로 분리(화면·키보드·Undo 세 곳이 같은 판단을 쓰게).
-`Card`에 액션 버튼 3개, `App`에 `handleMove`. 지금은 응답을 기다렸다가 반영한다.
+TanStack Query 도입. `useMoveStage`에서 **필드 단위 롤백**(`{id, from}`)을 쓴다.
+공식 레시피의 전체 스냅샷 롤백은 연속 이동 시 두 단계 전으로 되돌아가고
+그 사이 다른 카드 변경까지 되돌리므로 채택하지 않았다.
+`onSettled` 무효화도 빼고 성공 응답의 카드로만 교체한다(1,000건 재조회 + 늦은 목록이 덮어쓰는 문제).
 
-검증: 5단계 버튼 구성 전부 규칙대로, 이동 후 새로고침 유지, 실패 시 개수 불변 + role=alert.
+**재현한 결함**: 요청1 실패가 요청2 성공보다 늦게 도착하면 확정 상태를 덮어쓴다.
+화면 서류검토 / 서버 처우협의로 어긋남. 커밋 8에서 수정.
 
-다음: 커밋 7 `feat(optimistic-update)` — **codex 교차 리뷰 포함 풀 검증 구간**
+다음: 커밋 8 `fix(optimistic-update)` — 늦게 도착한 응답 무시
 
 ---
 

@@ -6,11 +6,9 @@ import styles from './Card.module.css'
 interface CardProps {
   candidate: Candidate
   onMove: (candidate: Candidate, to: Stage) => void
-  /** 이 카드의 이동 요청이 진행 중인가. */
-  pending?: boolean
 }
 
-export function Card({ candidate, onMove, pending = false }: CardProps) {
+export function Card({ candidate, onMove }: CardProps) {
   const { name, position, appliedAt, stage } = candidate
 
   const previous = previousStage(stage)
@@ -23,7 +21,13 @@ export function Card({ candidate, onMove, pending = false }: CardProps) {
      * 이름 없는 article이 수백 개 반복된다. 안으로 들어가 본문을 읽어야만 누구인지 알 수 있다.
      * aria-label로 카드의 이름을 지어주면 목록을 훑는 것만으로 대상을 찾을 수 있다.
      */
-    <article className={styles.card} aria-label={`${name} · ${position}`} data-pending={pending}>
+    <article
+      className={styles.card}
+      // 이름이 겹치는 지원자가 있어 화면상 식별이 불가능하다.
+      // 포커스 복원(커밋 13)과 가상 스크롤(커밋 14)에서 카드를 다시 찾을 때도 필요하다.
+      data-id={candidate.id}
+      aria-label={`${name} · ${position}`}
+    >
       <span className={styles.name} title={name}>
         {name}
       </span>
@@ -54,7 +58,7 @@ export function Card({ candidate, onMove, pending = false }: CardProps) {
         <button
           type="button"
           className={styles.action}
-          disabled={!previous || pending}
+          disabled={!previous}
           onClick={() => previous && onMove(candidate, previous)}
           aria-label={previous ? `${name}을(를) ${STAGE_LABEL[previous]}(으)로 이동` : undefined}
         >
@@ -63,7 +67,7 @@ export function Card({ candidate, onMove, pending = false }: CardProps) {
         <button
           type="button"
           className={styles.action}
-          disabled={!next || pending}
+          disabled={!next}
           onClick={() => next && onMove(candidate, next)}
           aria-label={next ? `${name}을(를) ${STAGE_LABEL[next]}(으)로 이동` : undefined}
         >
@@ -72,7 +76,7 @@ export function Card({ candidate, onMove, pending = false }: CardProps) {
         <button
           type="button"
           className={`${styles.action} ${styles.reject}`}
-          disabled={!rejectable || pending}
+          disabled={!rejectable}
           onClick={() => onMove(candidate, REJECTED)}
           aria-label={`${name}을(를) 불합격으로 이동`}
         >
