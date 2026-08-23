@@ -1,7 +1,11 @@
 .board {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  /*
+   * 컬럼 높이를 보드에 맞춰 늘린다. flex-start로 두면 내용이 적은 컬럼만 짧아져
+   * 단계마다 카드가 몇 장인지가 아니라 컬럼 크기가 먼저 눈에 들어온다.
+   */
+  align-items: stretch;
   /* 컬럼이 좁아지지 않도록 가로 스크롤을 보드에만 준다. 페이지 전체가 흔들리면 헤더도 같이 밀린다. */
   overflow-x: auto;
   padding-bottom: 8px;
@@ -25,6 +29,14 @@
   min-width: 240px;
   /* 매직넘버(calc(100vh - 140px)) 대신 부모 높이에 맞춘다. 헤더 높이가 바뀌어도 따라간다. */
   max-height: 100%;
+  /*
+   * flex 항목의 기본 min-height는 auto라서 "내용보다 작아질 수 없다"는 제약이 걸린다.
+   * 컬럼 안에는 카드가 수백 장 있어 그 내용 높이가 37,000px을 넘고,
+   * 화면에는 max-height 때문에 잘려 보이지만 레이아웃상 문서 높이는 그만큼 늘어난다.
+   * 데스크톱에서는 빈 화면이 한참 스크롤되는 것으로, 모바일에서는 브라우저가
+   * 그 크기에 맞춰 화면 전체를 축소해버리는 것으로 드러난다.
+   */
+  min-height: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);

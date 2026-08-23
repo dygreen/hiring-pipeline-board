@@ -6,9 +6,11 @@ interface ColumnProps {
   stage: Stage
   count: number
   children: ReactNode
+  /** 로딩 중이면 개수를 감춘다. 아직 모르는 값을 0으로 보여주면 "0건"이라는 오정보가 된다. */
+  loading?: boolean
 }
 
-export function Column({ stage, count, children }: ColumnProps) {
+export function Column({ stage, count, children, loading = false }: ColumnProps) {
   const label = STAGE_LABEL[stage]
 
   return (
@@ -25,9 +27,11 @@ export function Column({ stage, count, children }: ColumnProps) {
          * 숫자만 읽어주면 무엇의 개수인지 알 수 없어서 aria-label로 보충한다.
          * 화면에는 "12"만 보이고 스크린리더는 "면접 12건"으로 읽는다.
          */}
-        <span className={styles.columnCount} aria-label={`${label} ${count}건`}>
-          {count}
-        </span>
+        {!loading && (
+          <span className={styles.columnCount} aria-label={`${label} ${count}건`}>
+            {count}
+          </span>
+        )}
       </header>
       <div className={styles.columnBody}>{children}</div>
     </section>

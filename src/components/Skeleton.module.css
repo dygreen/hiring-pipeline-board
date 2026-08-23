@@ -1,0 +1,29 @@
+.skeletonCard {
+  /* 실제 카드와 같은 높이여야 로딩이 끝날 때 목록이 튀지 않는다. */
+  min-height: 74px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef0f3 25%, #f6f7f9 50%, #eef0f3 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/*
+ * 움직임을 줄이도록 설정한 사용자에게는 애니메이션을 멈춘다.
+ * 전정기관 장애가 있으면 반복 애니메이션이 어지럼증을 유발한다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCard {
+    animation: none;
+    background: #eef0f3;
+  }
+}

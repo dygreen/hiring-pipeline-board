@@ -20,6 +20,10 @@ async function simulateNetwork(): Promise<{ failed: boolean }> {
 }
 
 export const handlers = [
+  /*
+   * 오류 메시지는 '원인'만 담는다. '무엇이 실패했는지'는 화면이 안다.
+   * 서버가 "지원자 목록을 불러오지 못했습니다"를 내려주면 화면 제목과 겹쳐 같은 문장이 두 번 보인다.
+   */
   /**
    * 목록 조회.
    * 검색·필터는 클라이언트에서 처리하므로 전체를 내려준다. 이유는 DECISIONS.md 참조.
@@ -29,7 +33,7 @@ export const handlers = [
 
     if (failed) {
       return HttpResponse.json<ApiError>(
-        { code: 'FETCH_FAILED', message: '지원자 목록을 불러오지 못했습니다.' },
+        { code: 'FETCH_FAILED', message: '서버와 통신하지 못했습니다.' },
         { status: 503 },
       )
     }
@@ -53,7 +57,7 @@ export const handlers = [
 
     if (failed) {
       return HttpResponse.json<ApiError>(
-        { code: 'MOVE_FAILED', message: '단계 이동에 실패했습니다.' },
+        { code: 'MOVE_FAILED', message: '서버와 통신하지 못했습니다.' },
         { status: 503 },
       )
     }

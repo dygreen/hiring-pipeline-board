@@ -1,0 +1,56 @@
+/* 로딩·에러·빈 상태가 같은 자리에 같은 크기로 나타나야 화면이 덜컹거리지 않는다. */
+.stateView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 1;
+  min-height: 200px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.description {
+  font-size: 0.8125rem;
+  margin: 0;
+  max-width: 34ch;
+  line-height: 1.5;
+}
+
+.retry {
+  margin-top: 4px;
+  padding: 7px 16px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.retry:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.retry:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* 컬럼 안에 들어가는 빈 상태는 훨씬 작아야 한다. */
+.inColumn {
+  min-height: 0;
+  padding: 20px 12px;
+  font-size: 0.75rem;
+}

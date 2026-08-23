@@ -1,4 +1,5 @@
 import { STAGES, type Candidate } from '../../types/candidate'
+import { StateView } from '../../components/StateView'
 import { Column } from './Column'
 import styles from './Board.module.css'
 
@@ -27,7 +28,11 @@ export function Board({ candidates, renderCard }: BoardProps) {
     <div className={styles.board}>
       {STAGES.map((stage) => (
         <Column key={stage} stage={stage} count={grouped[stage].length}>
-          {grouped[stage].map(renderCard)}
+          {grouped[stage].length === 0 ? (
+            <StateView compact title="지원자가 없습니다" />
+          ) : (
+            grouped[stage].map(renderCard)
+          )}
         </Column>
       ))}
     </div>
