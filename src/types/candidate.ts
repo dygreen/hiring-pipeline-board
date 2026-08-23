@@ -21,7 +21,14 @@ export interface Candidate {
   email: string
   phone: string
   experienceYears: number
-  /** 서버가 갱신할 때마다 올라간다. 늦게 도착한 응답을 판별하는 근거. */
+  /** 마지막 변경 시각 (ISO 8601). 상세 화면 표시용. */
   updatedAt: string
+  /**
+   * 서버가 갱신할 때마다 1씩 올린다. 늦게 도착한 응답을 판별하는 근거.
+   *
+   * 시각(updatedAt)으로 비교하지 않는 이유: 같은 밀리초 안에 두 번 갱신되면
+   * 두 응답의 시각이 같아져서 어느 쪽이 최신인지 가릴 수 없다.
+   */
+  revision: number
   note?: string
 }

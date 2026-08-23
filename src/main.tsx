@@ -1,10 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { startMockApi } from './mocks/start'
 import './index.css'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// mock 워커가 뜨기 전에 앱이 요청을 보내면 실제 네트워크로 새어나가 404가 된다.
+// 그래서 워커 준비를 기다린 뒤에 렌더한다.
+startMockApi().then(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+})
